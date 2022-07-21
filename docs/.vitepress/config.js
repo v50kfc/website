@@ -1,5 +1,5 @@
 export default {
   base: '/website/',
-  title: ' V50',
+  title: '🤩  KFC Crazy Thursday',
   description: 'Just playing around.'
 }
