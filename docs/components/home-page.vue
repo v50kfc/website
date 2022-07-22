@@ -11,9 +11,8 @@ import source from "../public/source.js";
   <div class="page-content">
     <p class="page-title">KFC Crazy Thursday</p>
     <div class="page-main">
-      <div class="card" v-for="(item, idx) in source" :key="idx">
+      <div class="card" v-for="(item, idx) in source" :key="idx" >
         {{ item }}
-        <div class="btn">copy</div>
       </div>
     </div>
 
@@ -24,12 +23,8 @@ import source from "../public/source.js";
 .page-content {
   width: 1280px;
   margin: 60px auto 0px;
-  overflow: auto;
   height: calc(100vh - var(--vp-nav-height));
-  // display: grid;
-  // grid-template-columns: repeat(auto-fill, 300px);
-  // grid-row-gap: 6px;
-  // grid-column-gap: 10px;
+
   .page-title {
     text-align: center;
     font-size: 66px;
@@ -39,23 +34,16 @@ import source from "../public/source.js";
   }
   .page-main {
     margin-top: 47px;
+    margin-bottom: 47px;
   }
   .card {
+    cursor: pointer;
     border-radius: 6px;
     padding: 12px;
     border: 1px solid var(--vp-c-divider);
-    margin-bottom: 12px;
-  }
-  .btn {
-    margin: 0 auto;
-    width: 120px;
-    background-color: #e4002b;
-    padding: 10px;
-    border-radius: 5px;
-    font-weight: normal !important;
-    text-align: center;
-    margin: 5px 0% 15px 0%;
-    color: #fff;
+    margin-bottom: 20px;
+    font-size: 22px;
+    box-shadow: 0 4px 8px var(--vp-c-bg-mute);
   }
 }
 </style>
