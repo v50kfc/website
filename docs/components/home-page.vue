@@ -1,94 +1,78 @@
 <script setup lang="ts">
+import { ref } from "vue";
 import source from "../public/source.js";
-// import flipCard from './flip-card.vue'
-// import { ref } from "vue";
-// const a = ref("123213");
-// import { VPTeamMembers } from 'vitepress/theme'
-// import { teamMembers } from '../contributors'
-
-// var book = $("#book");
-// $("#view-cover").click(function () {
-//   $(this).addClass("cur").siblings().removeClass("cur");
-//   book.removeClass().addClass("view-cover");
-// });
-// $("#view-back").click(function () {
-//   $(this).addClass("cur").siblings().removeClass("cur");
-//   book.removeClass().addClass("view-back");
-// });
-// $("#open-book").click(function () {
-//   if (book.attr("class") != "open-book") {
-//     $(this).addClass("cur").siblings().removeClass("cur");
-//     book.removeClass().addClass("open-book");
-//   } else {
-//     $(this).removeClass("cur");
-//     $("#view-cover").addClass("cur");
-//     book.removeClass().addClass("view-cover");
-//   }
-// });
-// $("#view-rotate").click(function () {
-//   $(this).addClass("cur").siblings().removeClass("cur");
-//   book.removeClass().addClass("view-rotate");
-// });
+const isOpen = ref<boolean>(false);
+const handleClick = () => {
+  if (isOpen.value) {
+    activeIndex.value = 0;
+  }
+  isOpen.value = !isOpen.value;
+};
+const activeIndex = ref<number>(0);
+const handlePsrevious = () => {
+  if (activeIndex.value === 0) return;
+  activeIndex.value--;
+};
+const handleNext = () => {
+  if (activeIndex.value === source.length || !isOpen.value) return;
+  activeIndex.value++;
+};
+const handleCopy = async () => {
+  const handleCopyText = async (text: string) => {
+    try {
+      const clipboardObj = navigator.clipboard;
+      if (!clipboardObj) return;
+      await clipboardObj.writeText(text);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  if (!isOpen.value) {
+    handleCopyText("v50");
+    return;
+  }
+  handleCopyText(source[activeIndex.value]);
+};
 </script>
 
 <template>
-  <div class="page-content">
-    <!-- <div id="opt">
-      <dl>
-        <dt>Console</dt>
-        <dd id="view-cover" class="cur">View Cover</dd>
-        <dd id="view-back">View Back</dd>
-        <dd id="open-book">Open/Close book</dd>
-        <dd id="view-rotate">360° Showcase</dd>
-      </dl>
-    </div> -->
+  <div class="page-content" :class="[isOpen ? 'open-book' : '']">
+    <div id="opt">
+      <span @click="handleClick">打开</span>
+      <span @click="handlePsrevious">上一页</span>
+      <span @click="handleNext">下一页</span>
+      <span @click="handleCopy">copy</span>
+    </div>
     <div id="book" class="view-cover">
       <div class="main">
         <div class="book-font">
           <div class="book-cover">
-            <h1 class="title">Wuthering Heights</h1>
-            <h2 class="author">Emily Bronte</h2>
-            <div class="publisher">Oxford University Press, USA</div>
+            <h1 class="title">疯狂星期四文案指南</h1>
+            <img src="/img/images.jpeg" style="margin: 90px auto 0" alt="" />
+            <div class="publisher">https://github.com/v50kfc</div>
           </div>
           <div class="book-cover-back"></div>
         </div>
-        <div class="book-page">
+        <div
+          class="book-page"
+          v-for="(item, idx) in source"
+          :key="idx"
+          :style="{ zIndex: source.length - idx }"
+          :class="{ active: idx < activeIndex }"
+        >
           <div id="page-1" class="page">
-            <h3>1 Mr Lockwood visits Wuthering Heights</h3>
             <p>
-              1801 I have just returned from a visit to my landlord—the solitary
-              neighbour that I shall be troubled with. This is certainly a
-              beautiful country! In all England, I do not believe that I could
-              have fixed on a situation so completely removed from the stir of
-              society. A perfect misanthropist’s heaven; and Mr. Heathcliff and
-              I are such a suitable pair to divide the desolation between us. A
-              capital fellow! He little imagined how my heart warmed towards him
-              when I beheld his black eyes withdraw so suspiciously under their
-              brows, as I rode up, and when his fingers sheltered themselves,
-              with a jealous resolution, still further in his waistcoat, as I
-              announced my name.
-            </p>
-            <p>“Mr. Heathcliff!” I said.</p>
-            <p>A nod was the answer.</p>
-            <p>
-              “Mr. Lockwood, your new tenant, sir. I do myself the honour of
-              calling as soon as possible after my arrival, to express the hope
-              that I have not inconvenienced you by my perseverance in
-              soliciting the occupation of Thrushcross Grange”
+              {{ item }}
             </p>
           </div>
-          <div class="page-number">- 1 -</div>
+          <div class="page-number">- {{ idx + 1 }} -</div>
         </div>
         <div class="book-back">
           <div class="description">
             <p>
-              "Ideal for the college survey course: judicious introduction plus
-              just the right admixture of explanatory notes (vital for American
-              students' comprehension of dialect words), up-to-date
-              bibliography, and several other brief, indispensable supports to
-              well-informed reading."
+              <!-- {{ source[source.length - 3] }} -->
             </p>
-            <p class="txt-right">--Katherine Linehan, Oberlin College</p>
+            <!-- <p class="txt-right">-- kfc</p> -->
           </div>
           <div class="isbn">
             <img
@@ -96,9 +80,7 @@ import source from "../public/source.js";
             />
           </div>
         </div>
-        <div class="book-bone">
-          <h2>Emily Bronte　Wuthering Heights</h2>
-        </div>
+        <div class="book-bone"></div>
         <div class="book-top"></div>
         <div class="book-right"></div>
         <div class="book-bottom"></div>
@@ -106,7 +88,7 @@ import source from "../public/source.js";
     </div>
   </div>
 </template>
-<style lang="css" scoped>
+<style lang="less" scoped>
 body {
   line-height: normal;
 }
@@ -120,7 +102,6 @@ body {
 }
 #book {
   width: 420px;
-  margin: 0 auto;
   position: relative;
   transition-duration: 0.5s;
   perspective: 2000px;
@@ -132,6 +113,8 @@ body {
   position: relative;
   transform-style: preserve-3d;
   transition-duration: 0.5s;
+  /* transform: rotate3d(0, 1, 0, 180deg); */
+  /* transform: rotate3d(12, 1, 1, 25deg); */
   /* transform: rotate3d(0, 1, 0, -40deg); */
 }
 
@@ -175,7 +158,6 @@ body {
 }
 .title {
   margin: 70px 0 25px 0;
-  height: 38px;
   font-size: 38px;
 }
 .author {
@@ -194,10 +176,15 @@ body {
   line-height: 20px;
   position: absolute;
   top: 5px;
-  z-index: 9;
+  /* z-index: 9; */
   box-shadow: inset 3px 0 10px rgba(0, 0, 0, 0.1);
   transform-style: preserve-3d;
   transform: translate3d(0, 0, 24px);
+  transform-origin: 0% 50%;
+  transition-duration: 0.5s;
+  &.active {
+    transform: translate3d(0, 0, 24px) rotate3d(0, 1, 0, -150deg);
+  }
 }
 .page {
   height: 500px;
@@ -210,7 +197,7 @@ body {
   margin-bottom: 14px;
 }
 .book-page p {
-  font-size: 13px;
+  font-size: 16px;
   margin-bottom: 14px;
 }
 .page-number {
@@ -321,7 +308,7 @@ body {
   backface-visibility: hidden;
 }
 .view-cover:hover .main {
-  transform: rotate3d(0, 1, 0, -40deg);
+  /* transform: rotate3d(0, 1, 0, -40deg); */
 }
 .view-back .main {
   transform: rotate3d(0, 1, 0, 180deg);
@@ -329,64 +316,44 @@ body {
 .view-back:hover .main {
   transform: rotate3d(0, 1, 0, 140deg);
 }
+
 .open-book {
-  transform: translate3d(50%, 0, 0);
-}
-.open-book .book-font {
-  transform: translate3d(0, 0, 25px) rotate3d(0, 1, 0, -160deg);
+  .view-cover {
+    transform: translateX(220px);
+  }
+  .book-font {
+    transform: translate3d(0, 0, 25px) rotate3d(0, 1, 0, -160deg);
+  }
 }
 .open-book:hover .main {
-  transform: rotate3d(1, 1, 0, 15deg);
+  /* transform: rotate3d(1, 1, 0, 15deg); */
 }
 .view-rotate .main {
   transition-duration: 5s;
-
-  transform: rotate3d(0, 1, 0, 360deg);
+  transform: rotate3d(0, 1, 0, 180deg);
 }
-.view-rotate:hover .main {
+/* .view-rotate:hover .main {
   transition-duration: 8s;
   transform: rotate3d(0, 1, 0, -360deg);
-}
+} */
 
 #opt {
-  width: 150px;
-  line-height: 30px;
   text-align: center;
-  padding: 10px 10px 5px 10px;
   background: rgba(255, 255, 255, 0.4);
-  position: fixed;
-  top: 10%;
-  right: 6%;
-  z-index: 100px;
-}
-#opt:after {
-  content: "";
-  width: 105%;
-  height: 104%;
   position: absolute;
-  top: -4%;
-  left: -5%;
-  border: 4px solid rgba(255, 255, 255, 0.3);
-  z-index: -1;
-}
-#opt dt {
-  margin-bottom: 5px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-}
-#opt dd {
-  color: #999;
-  cursor: pointer;
-  background: rgba(170, 170, 170, 0.1);
-  margin-bottom: 5px;
-}
-#opt dd:hover {
-  color: rgba(255, 255, 255, 0.8);
-  box-shadow: inset 2px 0 0 rgba(85, 85, 85, 0.2);
-  background: rgba(85, 85, 85, 0.4);
-}
-#opt .cur {
-  color: black;
-  box-shadow: inset 2px 0 0 rgba(85, 85, 85, 0.2);
-  background: rgba(85, 85, 85, 0.2);
+  border-radius: 6px;
+  display: flex;
+  top: 8%;
+  right: 6%;
+  z-index: 2;
+  & span {
+    cursor: pointer;
+    margin: 5px;
+    padding: 5px;
+    border-radius: 6px;
+    // &:hover {
+    //   background-color: #2e2e2e;
+    // }
+  }
 }
 </style>
