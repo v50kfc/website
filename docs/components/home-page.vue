@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import source from "../public/source.js";
 const isOpen = ref<boolean>(false);
 const handleClick = () => {
@@ -9,7 +9,7 @@ const handleClick = () => {
   isOpen.value = !isOpen.value;
 };
 const activeIndex = ref<number>(0);
-const handlePsrevious = () => {
+const handlePrev = () => {
   if (activeIndex.value === 0) return;
   activeIndex.value--;
 };
@@ -33,13 +33,19 @@ const handleCopy = async () => {
   }
   handleCopyText(source[activeIndex.value]);
 };
+
+onMounted(() => {
+  setTimeout(() => {
+    handleClick();
+  }, 250);
+});
 </script>
 
 <template>
   <div class="page-content" :class="[isOpen ? 'open-book' : '']">
     <div id="opt">
-      <span @click="handleClick">打开</span>
-      <span @click="handlePsrevious">上一页</span>
+      <span @click="handleClick">{{ isOpen ? "关闭" : "打开" }} </span>
+      <span @click="handlePrev">上一页</span>
       <span @click="handleNext">下一页</span>
       <span @click="handleCopy">copy</span>
     </div>
